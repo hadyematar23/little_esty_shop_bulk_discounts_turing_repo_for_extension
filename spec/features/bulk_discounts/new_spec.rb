@@ -9,8 +9,6 @@ RSpec.describe 'bulk discount' do
     @bulk_discount2 = @merchant1.bulk_discounts.create!(quantity_threshold: 8, percentage_discount: 12)
     @bulk_discount3 = @merchant2.bulk_discounts.create!(quantity_threshold: 15, percentage_discount: 25)
 
-
-
     @customer_1 = Customer.create!(first_name: 'Joey', last_name: 'Smith')
     @customer_2 = Customer.create!(first_name: 'Cecilia', last_name: 'Jones')
     @customer_3 = Customer.create!(first_name: 'Mariah', last_name: 'Carrey')
