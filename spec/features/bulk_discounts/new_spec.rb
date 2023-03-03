@@ -50,75 +50,52 @@ RSpec.describe 'bulk discount' do
   end
 
   describe "as a merchant" do
-    describe "when taken to merchant's bulk discounts index page" do 
-      it "i see all of the bulk discounts listed there " do #US1
-        visit merchant_bulk_discounts_path(@merchant1)
-
-        within("div#list_bulk_discounts") do 
-          expect(page).to have_content("Bulk Discounts")
-
-          expect(page).to have_content("Quantity Threshold: #{@bulk_discount1.quantity_threshold}, Percent Discount: #{@bulk_discount1.percentage_discount}")
-
-          expect(page).to have_content("Quantity Threshold: #{@bulk_discount2.quantity_threshold}, Percent Discount: #{@bulk_discount2.percentage_discount}")
-
-          expect(page).to_not have_content("Quantity Threshold: #{@bulk_discount3.quantity_threshold}, Percent Discount: #{@bulk_discount3.percentage_discount}")
-
-        end
-      end 
-
-      it "each bulk discount has a link to its show page" do #US1
-        visit merchant_bulk_discounts_path(@merchant1)
-
-        within("div#bulk_discount_number#{@bulk_discount1.id}") do   
-          expect(page).to have_link("Link", href: merchant_bulk_discount_path(@merchant1, @bulk_discount1) )
-        end 
-      end 
-
-
-      it "See a link to create a new discount" do #US2
-        visit merchant_bulk_discounts_path(@merchant1)
-
-        expect(page).to have_link("Create New Bulk Discount", href: new_merchant_bulk_discount_path(@merchant1))
-
-      end 
-
-      it "See a link to create a new discount" do #US2
-        visit merchant_bulk_discounts_path(@merchant1)
-
-        click_link("Create New Bulk Discount")
-
-        expect(current_path).to eq(new_merchant_bulk_discount_path(@merchant1))
-
-      end 
-
-      it "Next to each bulk discount item I see a link to delete this item" do 
-        visit merchant_bulk_discounts_path(@merchant1)
-
-        within("div#bulk_discount_number#{@bulk_discount1.id}") do  
-
-          expect(page).to have_selector("a[href='#{merchant_bulk_discount_path(@merchant1, @bulk_discount1)}'][data-method='delete']", text: "Delete Discount")
-        end 
-      end 
-
-      it "I click on that delete discount link and am redirected back to the index and will not see the delete discount anymore on the index" do 
-        visit merchant_bulk_discounts_path(@merchant1)
-
-        within("div#bulk_discount_number#{@bulk_discount1.id}") do  
-
-          expect(page).to have_content("Quantity Threshold: #{@bulk_discount1.quantity_threshold}, Percent Discount: #{@bulk_discount1.percentage_discount}")
-
-          expect(@merchant1.bulk_discounts.count).to eq(2)
-
-          click_link("Delete Discount")
-        end 
-          expect(@merchant1.bulk_discounts.count).to eq(1)
-          save_and_open_page
-
-          expect(page).to_not have_content("Quantity Threshold: #{@bulk_discount1.quantity_threshold}, Percent Discount: #{@bulk_discount1.percentage_discount}")
-
-          expect(page).to have_content("Discount was successfully deleted")
-      end 
+    describe "when visit the merchant's new item page" do 
+      it "i see a form to fill in with valid data " do #US2
+        visit new_merchant_bulk_discount_path(@merchant1)
         
-    end
-  end
-end 
+        expect(page).to have_selector("form")
+        expect(page).to have_field("quantity_threshold")
+        expect(page).to have_field("percentage_discount")
+        expect(page).to have_button("Create Bulk Discount")
+
+      end 
+
+      it "I fill in the form with valid data and I am then redirected back to the bulk discount index and see the new bulk discount listed" do 
+
+        visit new_merchant_bulk_discount_path(@merchant1)
+
+        expect(page).to_not have_content("Quantity Threshold: 12, Percent Discount: 20")
+
+        fill_in "bulk_discount[quantity_threshold]", with: 12
+        fill_in "bulk_discount[percentage_discount]", with: 20
+        click_button("Create Bulk Discount")
+        save_and_open_page
+
+        expect(current_path).to eq(merchant_bulk_discounts_path(@merchant1))
+        expect(page).to have_content("Quantity Threshold: 12, Percent Discount: 20")
+        expect(page).to have_content("New Discount was successfully saved")
+      end 
+
+      describe "sad path testing" do 
+        it "if you fail to put the proper information, the bulk discount item will not be created and you will be redirected back to the new page again to create the item again" do 
+
+        visit new_merchant_bulk_discount_path(@merchant1)
+
+        fill_in "bulk_discount[quantity_threshold]", with: "A random string"
+        fill_in "bulk_discount[percentage_discount]", with: 20
+        expect(@merchant1.bulk_discounts.count).to eq(2)
+        click_button("Create Bulk Discount")
+        save_and_open_page
+
+        expect(@merchant1.bulk_discounts.count).to eq(2)
+        expect(current_path).to eq(new_merchant_bulk_discount_path(@merchant1))
+        expect(page).to have_content("Both the percentage discount and the quantity threshold must be completed and must be integers!")
+        end 
+      end 
+
+
+
+      end 
+    end 
+  end 
