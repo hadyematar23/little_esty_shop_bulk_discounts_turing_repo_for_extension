@@ -53,8 +53,8 @@ RSpec.describe 'bulk discount' do
         visit new_merchant_bulk_discount_path(@merchant1)
         
         expect(page).to have_selector("form")
-        expect(page).to have_field("quantity_threshold")
-        expect(page).to have_field("percentage_discount")
+        expect(page).to have_field("bulk_discount[quantity_threshold]")
+        expect(page).to have_field("bulk_discount[percentage_discount]")
         expect(page).to have_button("Create Bulk Discount")
 
       end 

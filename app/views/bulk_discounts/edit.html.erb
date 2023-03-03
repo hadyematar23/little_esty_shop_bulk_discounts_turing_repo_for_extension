@@ -1,0 +1,13 @@
+<div id= "Edit_Discount">
+  <h3>Edit Discount</h3>
+  <%= form_with model: [@merchant, @bulk_discount], local: true do |form| %>
+    <%= form.label :quantity_threshold %>
+    <%= form.number_field :quantity_threshold %>
+
+    <%= form.label :percentage_discount %>
+    <%= form.number_field :percentage_discount %>
+
+    <%= form.submit "Edit Bulk Discount" %>
+  <%end %>
+  </div>
+  <br>

@@ -1,1 +1,3 @@
 <%="In order to acheive this discount of #{@bulk_discount.percentage_discount}, you must purchase #{@bulk_discount.quantity_threshold}."%>
+
+<%=link_to "Edit Discount", edit_merchant_bulk_discount_path(@merchant, @bulk_discount)%> </p>
