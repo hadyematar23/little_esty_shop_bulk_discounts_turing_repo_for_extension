@@ -5,8 +5,21 @@ class BulkDiscountsController < ApplicationController
     @merchants_discounts = @merchant.bulk_discounts
   end
 
+  def update
+    merchant = Merchant.find(params[:merchant_id])
+    bulk_discount = BulkDiscount.find(params[:id])
+    bulk_discount.update(bulk_discount_params)
+    
+    if bulk_discount.save 
+      redirect_to merchant_bulk_discount_path(merchant, bulk_discount), notice: "New Discount was successfully edited"
+    else 
+      redirect_to edit_merchant_bulk_discount_path(merchant, bulk_discount), notice: "Failure to edit- Both the percentage discount and the quantity threshold must be completed and must be integers!"
+    end 
+  end
+
   def edit 
-    require 'pry'; binding.pry
+    @merchant = Merchant.find(params[:merchant_id])
+    @bulk_discount = BulkDiscount.find(params[:id])
   end
 
   def destroy
