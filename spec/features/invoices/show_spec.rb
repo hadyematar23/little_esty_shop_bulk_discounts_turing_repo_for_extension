@@ -14,6 +14,7 @@ RSpec.describe 'invoices show' do
 
     @item_5 = Item.create!(name: "Bracelet", description: "Wrist bling", unit_price: 200, merchant_id: @merchant2.id)
     @item_6 = Item.create!(name: "Necklace", description: "Neck bling", unit_price: 300, merchant_id: @merchant2.id)
+    @item_7 = Item.create!(name: "Headphones", description: "Neck bling", unit_price: 100, merchant_id: @merchant1.id)
 
     @customer_1 = Customer.create!(first_name: 'Joey', last_name: 'Smith')
     @customer_2 = Customer.create!(first_name: 'Cecilia', last_name: 'Jones')
@@ -55,7 +56,6 @@ RSpec.describe 'invoices show' do
 
   it "shows the invoice information" do
     visit merchant_invoice_path(@merchant1, @invoice_1)
-
     expect(page).to have_content(@invoice_1.id)
     expect(page).to have_content(@invoice_1.status)
     expect(page).to have_content(@invoice_1.created_at.strftime("%A, %B %-d, %Y"))
@@ -98,6 +98,17 @@ RSpec.describe 'invoices show' do
      within("#current-invoice-status") do
        expect(page).to_not have_content("in progress")
      end
+  end
+
+  it "see the total revenue for my merchant from this invoice (not including discounts)" do 
+    visit merchant_invoice_path(@merchant1, @invoice_1)
+
+    @bulk_discount1 = @merchant1.bulk_discounts.create!(quantity_threshold: 10, percentage_discount: 15)
+    @bulk_discount2 = @merchant1.bulk_discounts.create!(quantity_threshold: 5, percentage_discount: 10)
+    @ii_12 = InvoiceItem.create!(invoice_id: @invoice_1.id, item_id: @item_7.id, quantity: 3, unit_price: 100, status: 2)
+    
+    expect(page).to have_content("Total Revenue: #{@invoice_1.total_revenue}")
+
   end
 
 end
