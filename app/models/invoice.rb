@@ -11,8 +11,15 @@ class Invoice < ApplicationRecord
   enum status: [:cancelled, 'in progress', :completed]
 
   def total_revenue
-    discount = self.invoice_items.joins(:bulk_discounts).where("invoice_items.quantity > bulk_discounts.quantity_threshold").pluck("bulk_discounts.percentage_discount")
-    require 'pry'; binding.pry
-    invoice_items.sum("unit_price * quantity")
+    discount = invoice_items
+      .joins(:bulk_discounts)
+      .where("invoice_items.quantity > bulk_discounts.quantity_threshold")
+      .pluck("bulk_discounts.percentage_discount")
+      .first
+
+    self.invoice_items
+      .joins(:bulk_discounts)
+      .where("invoice_items.quantity > bulk_discounts.quantity_threshold")
+      .sum("invoice_items.quantity* (invoice_items.unit_price- (invoice_items.unit_price * #{discount}/100))")
   end
 end
