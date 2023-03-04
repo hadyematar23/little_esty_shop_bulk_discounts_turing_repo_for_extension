@@ -119,8 +119,8 @@ RSpec.describe 'invoices show' do
     bulk_discount3 = merchant1.bulk_discounts.create!(quantity_threshold: 20, percentage_discount: 25)
     visit merchant_invoice_path(merchant1, invoice_1)
 
-    expect(page).to have_content("Total Revenue (without discounts): #{invoice_1.total_revenue}")
-    expect(page).to have_content("Revenue Including Discounts: #{invoice_1.total_discounted_revenue}")
+    expect(page).to have_content("Total Revenue (without discounts): $#{invoice_1.total_revenue}")
+    expect(page).to have_content("Revenue Including Discounts: $#{invoice_1.total_discounted_revenue}")
 
   end
 
