@@ -14,6 +14,7 @@ RSpec.describe 'invoices show' do
 
     @item_5 = Item.create!(name: "Bracelet", description: "Wrist bling", unit_price: 200, merchant_id: @merchant2.id)
     @item_6 = Item.create!(name: "Necklace", description: "Neck bling", unit_price: 300, merchant_id: @merchant2.id)
+    @item_7 = Item.create!(name: "Headphones", description: "Neck bling", unit_price: 100, merchant_id: @merchant1.id)
 
     @customer_1 = Customer.create!(first_name: 'Joey', last_name: 'Smith')
     @customer_2 = Customer.create!(first_name: 'Cecilia', last_name: 'Jones')
@@ -55,7 +56,6 @@ RSpec.describe 'invoices show' do
 
   it "shows the invoice information" do
     visit merchant_invoice_path(@merchant1, @invoice_1)
-
     expect(page).to have_content(@invoice_1.id)
     expect(page).to have_content(@invoice_1.status)
     expect(page).to have_content(@invoice_1.created_at.strftime("%A, %B %-d, %Y"))
@@ -98,6 +98,49 @@ RSpec.describe 'invoices show' do
      within("#current-invoice-status") do
        expect(page).to_not have_content("in progress")
      end
+  end
+
+  it "see the total revenue for my merchant from this invoice, including discounts" do 
+
+    merchant1 = Merchant.create!(name: 'Hair Care')
+    item_1 = Item.create!(name: "Shampoo", description: "This washes your hair", unit_price: 10, merchant_id: merchant1.id, status: 1)
+    item_8 = Item.create!(name: "Butterfly Clip", description: "This holds up your hair but in a clip", unit_price: 5, merchant_id: merchant1.id)
+    customer_1 = Customer.create!(first_name: 'Joey', last_name: 'Smith')
+    invoice_1 = Invoice.create!(customer_id: customer_1.id, status: 2, created_at: "2012-03-27 14:54:09")
+    ii_1 = InvoiceItem.create!(invoice_id: invoice_1.id, item_id: item_1.id, quantity: 5, unit_price: 15, status: 2)
+    ii_11 = InvoiceItem.create!(invoice_id: invoice_1.id, item_id: item_8.id, quantity: 3, unit_price: 10, status: 1)
+    ii_15 = InvoiceItem.create!(invoice_id: invoice_1.id, item_id: item_8.id, quantity: 1, unit_price: 100, status: 1)
+    ii_12 = InvoiceItem.create!(invoice_id: invoice_1.id, item_id: item_8.id, quantity: 17, unit_price: 5, status: 2)
+    ii_13 = InvoiceItem.create!(invoice_id: invoice_1.id, item_id: item_8.id, quantity: 25, unit_price: 8, status: 2)
+
+
+    bulk_discount1 = merchant1.bulk_discounts.create!(quantity_threshold: 5, percentage_discount: 15)
+    bulk_discount2 = merchant1.bulk_discounts.create!(quantity_threshold: 15, percentage_discount: 20)
+    bulk_discount3 = merchant1.bulk_discounts.create!(quantity_threshold: 20, percentage_discount: 25)
+    visit merchant_invoice_path(merchant1, invoice_1)
+
+    expect(page).to have_content("Total Revenue (without discounts): $#{invoice_1.total_revenue}")
+    expect(page).to have_content("Revenue Including Discounts: $#{invoice_1.total_discounted_revenue}")
+
+  end
+
+  it "next to each invoice item, see the show page for the bulk discount that was applied (if any)" do 
+
+    merchant1 = Merchant.create!(name: 'Hair Care')
+    item_1 = Item.create!(name: "Shampoo", description: "This washes your hair", unit_price: 10, merchant_id: merchant1.id, status: 1)
+    item_8 = Item.create!(name: "Butterfly Clip", description: "This holds up your hair but in a clip", unit_price: 5, merchant_id: merchant1.id)
+    customer_1 = Customer.create!(first_name: 'Joey', last_name: 'Smith')
+    invoice_1 = Invoice.create!(customer_id: customer_1.id, status: 2, created_at: "2012-03-27 14:54:09")
+
+    ii_12 = InvoiceItem.create!(invoice_id: invoice_1.id, item_id: item_8.id, quantity: 17, unit_price: 5, status: 2)
+
+    bulk_discount1 = merchant1.bulk_discounts.create!(quantity_threshold: 5, percentage_discount: 15)
+    bulk_discount2 = merchant1.bulk_discounts.create!(quantity_threshold: 15, percentage_discount: 20)
+    bulk_discount3 = merchant1.bulk_discounts.create!(quantity_threshold: 20, percentage_discount: 25)
+
+    visit merchant_invoice_path(merchant1, invoice_1)
+
+    expect(page).to have_link("Bulk Discount of #{bulk_discount2.percentage_discount} percent when purchasing #{bulk_discount2.quantity_threshold}", href: "/merchant/#{merchant1.id}/bulk_discounts/#{bulk_discount2.id}")
   end
 
 end

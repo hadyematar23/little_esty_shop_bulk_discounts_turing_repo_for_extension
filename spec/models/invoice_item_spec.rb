@@ -11,6 +11,7 @@ RSpec.describe InvoiceItem, type: :model do
   describe "relationships" do
     it { should belong_to :invoice }
     it { should belong_to :item }
+    it { should have_many(:bulk_discounts).through(:item)}
   end
 
   describe "class methods" do
@@ -38,5 +39,26 @@ RSpec.describe InvoiceItem, type: :model do
     it 'incomplete_invoices' do
       expect(InvoiceItem.incomplete_invoices).to eq([@i1, @i3])
     end
-  end
+    end 
+
+    describe "instance methods" do 
+      it "can determine the applicable bulk discount" do 
+        merchant1 = Merchant.create!(name: 'Hair Care')
+        item_1 = Item.create!(name: "Shampoo", description: "This washes your hair", unit_price: 10, merchant_id: merchant1.id, status: 1)
+        item_8 = Item.create!(name: "Butterfly Clip", description: "This holds up your hair but in a clip", unit_price: 5, merchant_id: merchant1.id)
+        customer_1 = Customer.create!(first_name: 'Joey', last_name: 'Smith')
+        invoice_1 = Invoice.create!(customer_id: customer_1.id, status: 2, created_at: "2012-03-27 14:54:09")
+    
+        ii_12 = InvoiceItem.create!(invoice_id: invoice_1.id, item_id: item_8.id, quantity: 17, unit_price: 5, status: 2)
+    
+        bulk_discount1 = merchant1.bulk_discounts.create!(quantity_threshold: 5, percentage_discount: 15)
+        bulk_discount2 = merchant1.bulk_discounts.create!(quantity_threshold: 15, percentage_discount: 20)
+        bulk_discount3 = merchant1.bulk_discounts.create!(quantity_threshold: 20, percentage_discount: 25)
+
+        expect(ii_12.applicable_discount).to eq(bulk_discount2)
+      end
+    end
+
+
+
 end
