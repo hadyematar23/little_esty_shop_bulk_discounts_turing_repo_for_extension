@@ -11,17 +11,22 @@ class Invoice < ApplicationRecord
   enum status: [:cancelled, 'in progress', :completed]
 
   def total_revenue
+    invoice_items.sum("unit_price * quantity")
+  end
+
+  def total_discounted_revenue
     
-    max_items_with_discounts = self.invoice_items.select("invoice_items.*, MAX(bulk_discounts.percentage_discount/100) as max_ind_discount").joins(:bulk_discounts).where("invoice_items.quantity >= bulk_discounts.quantity_threshold").group(:id)
-
-   (self.invoice_items.where.not(id: max_items_with_discounts.ids).sum("quantity*unit_price"))+(self.invoice_items.joins(:bulk_discounts).joins("INNER JOIN (#{max_items_with_discounts.to_sql}) as max_discounts ON max_discounts.id = invoice_items.id").distinct.sum("invoice_items.quantity* (invoice_items.unit_price- (invoice_items.unit_price * max_discounts.max_ind_discount ))"))
-
+  max_items_with_discounts = self.invoice_items
+  .select("invoice_items.*, MAX((invoice_items.quantity*invoice_items.unit_price)*(bulk_discounts.percentage_discount/100)) as max_ind_discount")
+  .joins(:bulk_discounts)
+  .where("invoice_items.quantity >= bulk_discounts.quantity_threshold")
+  .group(:id)
+  .sum(&:max_ind_discount)
+ 
+  total_revenue - max_items_with_discounts
 
   end
 end
 
 
-    # items_with_discounts = self.invoice_items.select("invoice_items.*, MAX(bulk_discounts.percentage_discount) as max_discount").left_joins(:bulk_discounts).group(:id).where("invoice_items.quantity >= bulk_discounts.quantity_threshold")
-
-    # y = self.invoice_items.joins(:bulk_discounts).joins("INNER JOIN (#{max_items_with_discounts.to_sql}) as max_discounts ON max_discounts.id = invoice_items.id").distinct.sum("invoice_items.quantity* (invoice_items.unit_price- (invoice_items.unit_price * max_discounts.max_ind_discount ))")
 
