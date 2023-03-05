@@ -7,7 +7,7 @@ class Admin::InvoicesController < ApplicationController
   def show
     invoice = Invoice.find(params[:id])
     @total_revenue = invoice.total_revenue
-    @total_discounted_revenue = invoice.total_discounted_revenue
+    @total_discounted_revenue = invoice.total_discounted_revenue_all_merchants
   end
 
   def edit
