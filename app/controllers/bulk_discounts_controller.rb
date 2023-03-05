@@ -3,6 +3,8 @@ class BulkDiscountsController < ApplicationController
   def index 
     @merchant = Merchant.find(params[:merchant_id])
     @merchants_discounts = @merchant.bulk_discounts
+    @api_holidays = HolidayFacade.pull_holidays
+    require 'pry'; binding.pry
   end
 
   def update

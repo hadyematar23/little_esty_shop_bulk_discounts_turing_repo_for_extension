@@ -116,6 +116,20 @@ RSpec.describe 'bulk discount' do
 
           expect(page).to have_content("Discount was successfully deleted")
       end 
+
+      it "I see a section with the header of 'Upcoming Holidays' listing the next 3 holidays" do 
+        visit merchant_bulk_discounts_path(@merchant1)
+
+        within("div#holidays") do 
+          expect(page).to have_content("Upcoming Holidays")
+          expect(page).to have_content("March 20, 2023: Natalicio de Benito Juárez")
+          expect(page).to have_content("May 1, 2023: Día del Trabajo")
+          expect(page).to have_content("September 15, 2023: Día de la Independencia")
+        end
+
+
+
+      end
         
     end
   end
