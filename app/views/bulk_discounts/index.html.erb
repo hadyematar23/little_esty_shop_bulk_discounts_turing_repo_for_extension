@@ -21,10 +21,9 @@
 </div>
 
 <div id='holidays'>
-<h4>Upcoming Holidays</h4>
+<h4>Upcoming Holidays (Mexico... and no, Cinco de Mayo is an American holiday)</h4>
 <%@api_holidays.next_three_holidays.each do |holiday|%>
-<%binding.pry%>
-<%= Date.strptime("2023-03-20", "%Y-%m-%d").strftime("%B %-d, %Y")"" %>
+  <p><%= Date.strptime("#{holiday[:date]}", "%Y-%m-%d").strftime("%B %-d, %Y")%>: <%=holiday[:localName]%> </p>
 <%end%>
 
 </div>
