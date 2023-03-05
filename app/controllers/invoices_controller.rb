@@ -3,6 +3,7 @@ class InvoicesController < ApplicationController
   before_action :find_merchant, only: [:index]
 
   def index
+    require 'pry'; binding.pry
     @invoices = @merchant.invoices
   end
 
