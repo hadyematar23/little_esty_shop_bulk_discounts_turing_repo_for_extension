@@ -110,7 +110,7 @@ RSpec.describe 'bulk discount' do
           click_link("Delete Discount")
         end 
           expect(@merchant1.bulk_discounts.count).to eq(1)
-          save_and_open_page
+          
 
           expect(page).to_not have_content("Quantity Threshold: #{@bulk_discount1.quantity_threshold}, Percent Discount: #{@bulk_discount1.percentage_discount}")
 
