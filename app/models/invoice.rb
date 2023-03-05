@@ -15,7 +15,9 @@ class Invoice < ApplicationRecord
   end
 
   def total_merchant_revenue(merchant)
-    self.invoice_items.where(invoice_items: {item_id: (self.items.where(items: {merchant_id: merchant.id})).ids}).sum("unit_price * quantity")
+    self.invoice_items
+    .where(invoice_items: {item_id: (self.items.where(items: {merchant_id: merchant.id})).ids})
+    .sum("unit_price * quantity")
   end
 
   def total_discounted_revenue(merchant) #merchant_specific 
