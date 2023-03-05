@@ -27,7 +27,7 @@ RSpec.describe 'bulk discount edit spec' do
         fill_in "bulk_discount[quantity_threshold]", with: 20
         fill_in "bulk_discount[percentage_discount]", with: 40
         click_button("Edit Bulk Discount")
-        save_and_open_page
+        
         expect(current_path).to eq(merchant_bulk_discount_path(@merchant1, @bulk_discount1))
         expect(page).to have_content("In order to acheive this discount of 40.0, you must purchase 20.")
         expect(page).to have_content("New Discount was successfully edited")

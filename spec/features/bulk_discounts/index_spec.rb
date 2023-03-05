@@ -119,7 +119,7 @@ RSpec.describe 'bulk discount' do
 
       it "I see a section with the header of 'Upcoming Holidays' listing the next 3 holidays" do 
         visit merchant_bulk_discounts_path(@merchant1)
-save_and_open_page
+
         within("div#holidays") do 
           expect(page).to have_content("Upcoming Holidays")
           expect(page).to have_content("March 20, 2023: Natalicio de Benito Juárez")
