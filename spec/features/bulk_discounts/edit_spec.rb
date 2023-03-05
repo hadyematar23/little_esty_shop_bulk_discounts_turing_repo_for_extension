@@ -17,7 +17,7 @@ RSpec.describe 'bulk discount edit spec' do
 
         expect(page).to have_selector("form")
         expect(find_field("bulk_discount[quantity_threshold]").value).to eq("10")
-        expect(find_field("bulk_discount[percentage_discount]").value).to eq("15")
+        expect(find_field("bulk_discount[percentage_discount]").value).to eq("15.0")
 
       end 
 
@@ -29,7 +29,7 @@ RSpec.describe 'bulk discount edit spec' do
         click_button("Edit Bulk Discount")
         save_and_open_page
         expect(current_path).to eq(merchant_bulk_discount_path(@merchant1, @bulk_discount1))
-        expect(page).to have_content("In order to acheive this discount of 40, you must purchase 20.")
+        expect(page).to have_content("In order to acheive this discount of 40.0, you must purchase 20.")
         expect(page).to have_content("New Discount was successfully edited")
         
       end
@@ -41,7 +41,7 @@ RSpec.describe 'bulk discount edit spec' do
           fill_in "bulk_discount[quantity_threshold]", with: nil
           fill_in "bulk_discount[percentage_discount]", with: 40
           click_button("Edit Bulk Discount")
-          save_and_open_page
+          
           expect(page).to have_content("Failure to edit- Both the percentage discount and the quantity threshold must be completed and must be integers!")
           expect(current_path).to eq(edit_merchant_bulk_discount_path(@merchant1, @bulk_discount1))
      

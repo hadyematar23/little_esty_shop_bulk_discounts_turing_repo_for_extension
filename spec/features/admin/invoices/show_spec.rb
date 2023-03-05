@@ -1,6 +1,7 @@
 require 'rails_helper'
 
 describe 'Admin Invoices Index Page' do
+  describe "before block" do 
   before :each do
     @m1 = Merchant.create!(name: 'Merchant 1')
 
@@ -54,7 +55,8 @@ describe 'Admin Invoices Index Page' do
   end
 
   it 'should display the total revenue the invoice will generate' do
-    expect(page).to have_content("Total Revenue: $#{@i1.total_revenue}")
+  
+    expect(page).to have_content("Total Revenue (without discounts): $#{@i1.total_revenue}")
 
     expect(page).to_not have_content(@i2.total_revenue)
   end
@@ -67,6 +69,36 @@ describe 'Admin Invoices Index Page' do
 
       expect(current_path).to eq(admin_invoice_path(@i1))
       expect(@i1.status).to eq('completed')
+      end 
     end
+  end 
+
+  it "total_revenue" do
+    
+    merchant1 = Merchant.create!(name: 'Hair Care')
+    merchant2 = Merchant.create!(name: 'Clips')
+    merchant3 = Merchant.create!(name: 'Malenas Tours')
+
+
+    item_1 = Item.create!(name: "Shampoo", description: "This washes your hair", unit_price: 10, merchant_id: merchant1.id, status: 1)
+    item_8 = Item.create!(name: "Butterfly Clip", description: "This holds up your hair but in a clip", unit_price: 5, merchant_id: merchant2.id)
+
+    item_3 = Item.create!(name: "Tour", description: "In Huatulco!", unit_price: 5, merchant_id: merchant3.id)
+
+    customer_1 = Customer.create!(first_name: 'Joey', last_name: 'Smith')
+    invoice_1 = Invoice.create!(customer_id: customer_1.id, status: 2, created_at: "2012-03-27 14:54:09")
+
+    ii_1 = InvoiceItem.create!(invoice_id: invoice_1.id, item_id: item_1.id, quantity: 9, unit_price: 10, status: 2)
+    ii_2 = InvoiceItem.create!(invoice_id: invoice_1.id, item_id: item_3.id, quantity: 5, unit_price: 10, status: 1)
+    ii_3 = InvoiceItem.create!(invoice_id: invoice_1.id, item_id: item_8.id, quantity: 18, unit_price: 10, status: 1)
+
+    bulk_discount1 = merchant1.bulk_discounts.create!(quantity_threshold: 5, percentage_discount: 15)
+    bulk_discount2 = merchant1.bulk_discounts.create!(quantity_threshold: 15, percentage_discount: 20)
+
+    visit admin_invoice_path(invoice_1)
+    expect(page).to have_content("Total Revenue (without discounts): $#{invoice_1.total_revenue}")
+    expect(page).to have_content("Revenue Including Discounts: $#{invoice_1.total_discounted_revenue.round(2)}")
+
   end
+
 end

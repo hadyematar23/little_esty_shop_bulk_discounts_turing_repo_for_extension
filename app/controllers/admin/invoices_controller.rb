@@ -5,6 +5,9 @@ class Admin::InvoicesController < ApplicationController
   end
 
   def show
+    invoice = Invoice.find(params[:id])
+    @total_revenue = invoice.total_revenue
+    @total_discounted_revenue = invoice.total_discounted_revenue
   end
 
   def edit

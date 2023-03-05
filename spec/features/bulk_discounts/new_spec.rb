@@ -68,7 +68,7 @@ RSpec.describe 'bulk discount' do
         fill_in "bulk_discount[quantity_threshold]", with: 12
         fill_in "bulk_discount[percentage_discount]", with: 20
         click_button("Create Bulk Discount")
-        save_and_open_page
+        
 
         expect(current_path).to eq(merchant_bulk_discounts_path(@merchant1))
         expect(page).to have_content("Quantity Threshold: 12, Percent Discount: 20")
@@ -84,7 +84,7 @@ RSpec.describe 'bulk discount' do
         fill_in "bulk_discount[percentage_discount]", with: 20
         expect(@merchant1.bulk_discounts.count).to eq(2)
         click_button("Create Bulk Discount")
-        save_and_open_page
+        
 
         expect(@merchant1.bulk_discounts.count).to eq(2)
         expect(current_path).to eq(new_merchant_bulk_discount_path(@merchant1))
