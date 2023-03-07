@@ -2,7 +2,7 @@
 
 By [Hady Matar](https://github.com/hadyematar23)
 
-## Desription of Project
+## Description of Project
 
 This first part of this project was initially done as a [group project](https://github.com/hadyematar23/little-esty-shop) with several cohort members as a group project at Turing Backend Module 2 program. 
 
